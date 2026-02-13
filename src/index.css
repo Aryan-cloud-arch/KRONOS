@@ -1,0 +1,214 @@
+@import "tailwindcss";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+  background: #ffffff;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* ===================================== */
+/* PREMIUM SCROLLBAR                     */
+/* ===================================== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Firefox scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
+
+/* ===================================== */
+/* SELECTION                             */
+/* ===================================== */
+::selection {
+  background: #000;
+  color: #fff;
+}
+
+::-moz-selection {
+  background: #000;
+  color: #fff;
+}
+
+/* ===================================== */
+/* PRELOADER SPECIFIC STYLES             */
+/* ===================================== */
+
+/* 3D perspective for letter animations */
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+/* Smooth transform origin for letters */
+.transform-origin-bottom {
+  transform-origin: bottom center;
+}
+
+/* Loading shimmer animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-12deg);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Pulse ring animation */
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 1.5s ease-out forwards;
+}
+
+/* Progress bar glow */
+@keyframes progress-glow {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Dot loading animation */
+@keyframes dot-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+/* Gradient orb float */
+@keyframes float-orb {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(30px, -20px);
+  }
+}
+
+/* ===================================== */
+/* SUBTLE GRAIN OVERLAY                  */
+/* ===================================== */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.018;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* ===================================== */
+/* FOCUS STATES                          */
+/* ===================================== */
+*:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove focus outline for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ===================================== */
+/* NAVIGATION — 2.1 Desktop Structure    */
+/* ===================================== */
+
+/* Ensure nav grid columns don't collapse */
+header [role="banner"],
+header {
+  contain: layout;
+}
+
+/* Nav link hover underline smooth origin */
+nav a span {
+  transform-origin: left center;
+}
+
+/* Prevent layout shift when nav becomes solid */
+header {
+  will-change: background-color, backdrop-filter;
+  backface-visibility: hidden;
+}
+
+/* ===================================== */
+/* SMOOTH TRANSITIONS                    */
+/* ===================================== */
+a, button {
+  transition: all 0.2s ease;
+}
+
+/* ===================================== */
+/* REDUCED MOTION                        */
+/* ===================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
