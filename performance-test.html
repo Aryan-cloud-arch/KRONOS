@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KRONOS Performance Test</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: system-ui;
+            background: #0a0a0a;
+            color: #fff;
+            padding: 20px;
+        }
+        .container { max-width: 800px; margin: 0 auto; }
+        h1 { margin-bottom: 20px; color: #00ff88; }
+        .test-section {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+        }
+        .metric:last-child { border-bottom: none; }
+        .good { color: #00ff88; }
+        .warning { color: #ffaa00; }
+        .bad { color: #ff4444; }
+        button {
+            background: #00ff88;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        button:hover { background: #00cc66; }
+        #canvas { display: none; }
+        .loading { text-align: center; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 KRONOS Performance Diagnostics</h1>
+        
+        <div class="test-section">
+            <h2>📱 Device Information</h2>
+            <div id="deviceInfo"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🌐 Network Performance</h2>
+            <div id="networkInfo"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🎮 GPU & 3D Capabilities</h2>
+            <div id="gpuInfo"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>⚡ Performance Score</h2>
+            <div id="performanceScore" class="loading">Running tests...</div>
+        </div>
+
+        <button onclick="window.location.href='https://aryan-cloud-arch.github.io/KRONOS/'">
+            Launch KRONOS
+        </button>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // Device Info
+        const deviceInfo = document.getElementById('deviceInfo');
+        const ua = navigator.userAgent;
+        const memory = navigator.deviceMemory || 'Unknown';
+        const cores = navigator.hardwareConcurrency || 'Unknown';
+        
+        deviceInfo.innerHTML = `
+            <div class="metric"><span>Device Memory:</span><span class="${memory >= 4 ? 'good' : memory >= 2 ? 'warning' : 'bad'}">${memory} GB</span></div>
+            <div class="metric"><span>CPU Cores:</span><span class="${cores >= 4 ? 'good' : cores >= 2 ? 'warning' : 'bad'}">${cores}</span></div>
+            <div class="metric"><span>Platform:</span><span>${navigator.platform}</span></div>
+            <div class="metric"><span>User Agent:</span><span style="font-size: 12px;">${ua.substring(0, 60)}...</span></div>
+        `;
+
+        // Network Info
+        const networkInfo = document.getElementById('networkInfo');
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        
+        if (connection) {
+            const downlink = connection.downlink || 'Unknown';
+            const effectiveType = connection.effectiveType || 'Unknown';
+            networkInfo.innerHTML = `
+                <div class="metric"><span>Connection Type:</span><span class="${effectiveType === '4g' ? 'good' : effectiveType === '3g' ? 'warning' : 'bad'}">${effectiveType}</span></div>
+                <div class="metric"><span>Download Speed:</span><span class="${downlink >= 5 ? 'good' : downlink >= 1 ? 'warning' : 'bad'}">${downlink} Mbps</span></div>
+            `;
+        } else {
+            networkInfo.innerHTML = '<div class="metric"><span>Network API not supported</span></div>';
+        }
+
+        // GPU Info & WebGL Test
+        const gpuInfo = document.getElementById('gpuInfo');
+        const canvas = document.getElementById('canvas');
+        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+        
+        if (gl) {
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            const vendor = debugInfo ? gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) : 'Unknown';
+            const renderer = debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : 'Unknown';
+            const maxTexSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
+            
+            // WebGL Performance Test
+            const startTime = performance.now();
+            for (let i = 0; i < 1000; i++) {
+                gl.clear(gl.COLOR_BUFFER_BIT);
+            }
+            const endTime = performance.now();
+            const renderTime = (endTime - startTime).toFixed(2);
+            
+            gpuInfo.innerHTML = `
+                <div class="metric"><span>WebGL Support:</span><span class="good">✅ Supported</span></div>
+                <div class="metric"><span>GPU Vendor:</span><span>${vendor}</span></div>
+                <div class="metric"><span>GPU Renderer:</span><span style="font-size: 12px;">${renderer}</span></div>
+                <div class="metric"><span>Max Texture Size:</span><span class="${maxTexSize >= 4096 ? 'good' : maxTexSize >= 2048 ? 'warning' : 'bad'}">${maxTexSize}px</span></div>
+                <div class="metric"><span>Render Test (1000 frames):</span><span class="${renderTime < 100 ? 'good' : renderTime < 300 ? 'warning' : 'bad'}">${renderTime}ms</span></div>
+            `;
+        } else {
+            gpuInfo.innerHTML = '<div class="metric"><span class="bad">❌ WebGL not supported - 3D will NOT work!</span></div>';
+        }
+
+        // Performance Score
+        function calculateScore() {
+            let score = 0;
+            let issues = [];
+            
+            // Memory check
+            if (memory >= 4) score += 25;
+            else if (memory >= 2) score += 15;
+            else issues.push('Low device memory (<2GB)');
+            
+            // CPU check
+            if (cores >= 4) score += 25;
+            else if (cores >= 2) score += 15;
+            else issues.push('Low CPU cores (<2)');
+            
+            // Network check
+            if (connection) {
+                if (connection.effectiveType === '4g') score += 25;
+                else if (connection.effectiveType === '3g') score += 15;
+                else issues.push('Slow network connection');
+            } else {
+                score += 15;
+            }
+            
+            // GPU check
+            if (gl) {
+                score += 25;
+            } else {
+                issues.push('WebGL not supported - MAJOR ISSUE');
+            }
+            
+            const performanceScore = document.getElementById('performanceScore');
+            let verdict = '';
+            let className = '';
+            
+            if (score >= 80) {
+                verdict = '🧈 Butter Smooth - Your device is perfect!';
+                className = 'good';
+            } else if (score >= 60) {
+                verdict = '⚠️ Should work, but may lag on complex scenes';
+                className = 'warning';
+            } else {
+                verdict = '❌ Device struggles with 3D - Expect lag';
+                className = 'bad';
+            }
+            
+            performanceScore.innerHTML = `
+                <div class="metric"><span>Overall Score:</span><span class="${className}">${score}/100</span></div>
+                <div class="metric"><span>Verdict:</span><span class="${className}">${verdict}</span></div>
+                ${issues.length > 0 ? `<div style="margin-top: 15px; padding: 10px; background: #2a1a1a; border-radius: 4px;"><strong>Issues Found:</strong><ul style="margin-top: 10px; margin-left: 20px;">${issues.map(i => `<li>${i}</li>`).join('')}</ul></div>` : ''}
+            `;
+        }
+        
+        setTimeout(calculateScore, 100);
+    </script>
+</body>
+</html>
